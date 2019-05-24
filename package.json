@@ -1,0 +1,14 @@
+{
+  "name": "escapefromearth-backend",
+  "version": "1.0.0",
+  "description": "Backend escape from earth",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Node"
+  ],
+  "author": "Paradox Programming",
+  "license": "MIT"
+}
