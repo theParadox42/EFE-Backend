@@ -11,6 +11,7 @@ mongoose.connect("mongodb+srv://public:123@cluster0-baim8.gcp.mongodb.net/commun
 // Mongoose
 var Schema = mongoose.Schema;
 var levelSchema = new Schema({
+    type: String,
     map: String,
     level: [String],
     creator: String,
@@ -40,6 +41,7 @@ app.get("/levels/new", function(req, res){
 app.post("/levels/new", function(req, res){
     var b = req.body;
     var newLevel = {
+        type: b.type||"null",
         map: b.map||"",
         level: b.level||[],
         creator: b.creator||"Anonymous",
