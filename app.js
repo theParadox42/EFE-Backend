@@ -1,12 +1,11 @@
 var mongoose = require("mongoose");
 var express = require("express");
 var app = express();
+var bodyParser = require("body-parser");
 
-mongoose.connect("mongodb+srv://public:123@cluster0-baim8.gcp.mongodb.net/community_levels?retryWrites=true", 
-    {
-        useNewUrlParser: true
-    }
-)
+app.use(bodyParser.urlencoded({extended:true}));
+
+mongoose.connect("mongodb+srv://public:123@cluster0-baim8.gcp.mongodb.net/community_levels?retryWrites=true", { useNewUrlParser: true })
 
 var Schema = mongoose.Schema;
 
@@ -28,6 +27,18 @@ app.get("/levels", function(req, res){
         }
     })
 });
+
+app.post("/levels/new", function(req, res){
+    var newLevel = req.body;
+    Level.create(newLevel, function(err, newLvl){
+        if(err){
+            console.log(err);
+        } else {
+            res.redirect("/levels")
+        }
+    });
+});
+
 
 /*
 var level1 = new Level({
