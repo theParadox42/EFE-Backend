@@ -28,13 +28,18 @@ app.get("/levels", function(req, res){
     })
 });
 
+app.get("/levels/new", function(req, res){
+    res.render("newLevel.ejs");
+});
+
 app.post("/levels/new", function(req, res){
     var newLevel = req.body;
+    console.log(newLevel)
     Level.create(newLevel, function(err, newLvl){
         if(err){
             console.log(err);
         } else {
-            res.redirect("/levels")
+            res.send(newLvl);
         }
     });
 });
@@ -57,3 +62,4 @@ level1.save(function(err){
 app.listen(process.env.PORT || 8080, process.env.IP, function(){
     console.log("API Started");
 })
+
