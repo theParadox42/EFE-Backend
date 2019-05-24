@@ -1,14 +1,15 @@
+// Dependencies
 var mongoose = require("mongoose");
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 
+// Setup
 app.use(bodyParser.urlencoded({extended:true}));
-
 mongoose.connect("mongodb+srv://public:123@cluster0-baim8.gcp.mongodb.net/community_levels?retryWrites=true", { useNewUrlParser: true })
 
+// Mongoose
 var Schema = mongoose.Schema;
-
 var levelSchema = new Schema({
     map: String,
     level: [String],
@@ -17,24 +18,33 @@ var levelSchema = new Schema({
 })
 var Level = mongoose.model("Level", levelSchema);
 
+// Get
+app.get("/", function(req, res){
+    res.redirect("https://escapefromearth.tk")
+})
 app.get("/levels", function(req, res){
     Level.find({}, function(err, levels){
         if(err) {
             console.log("Error Getting Levels: " + err);
             res.send("Error");
         } else {
-            res.send(JSON.stringify(levels));
+            res.send(levels);
         }
     })
 });
-
 app.get("/levels/new", function(req, res){
     res.render("newLevel.ejs");
 });
 
+// Post
 app.post("/levels/new", function(req, res){
-    var newLevel = req.body;
-    console.log(newLevel)
+    var b = req.body;
+    var newLevel = {
+        map: b.map||"",
+        level: b.level||[],
+        creator: b.creator||"Anonymous",
+        difficulty: Math.min(Math.max(b.difficulty||1,1),10)
+    }
     Level.create(newLevel, function(err, newLvl){
         if(err){
             console.log(err);
@@ -44,22 +54,8 @@ app.post("/levels/new", function(req, res){
     });
 });
 
-
-/*
-var level1 = new Level({
-    map: "____^___^^^____###^",
-    creator: "theParadox42",
-    difficulty: 1
+// Run
+var app_port = process.env.PORT || 8080;
+app.listen(app_port, process.env.IP, function(){
+    console.log("API app started on port "+app_port);
 })
-
-level1.save(function(err){
-    console.log("it worked!")
-    console.log(err);
-    console.log(Level.find());
-});
-*/
-
-app.listen(process.env.PORT || 8080, process.env.IP, function(){
-    console.log("API Started");
-})
-

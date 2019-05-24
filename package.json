@@ -18,5 +18,14 @@
     "ejs": "^2.6.1",
     "express": "^4.17.0",
     "mongoose": "^5.5.11"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theParadox42/escape-from-earth-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/theParadox42/escape-from-earth-backend/issues"
+  },
+  "homepage": "https://escapefromearth.tk"
 }
