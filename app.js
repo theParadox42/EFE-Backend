@@ -8,9 +8,11 @@ var bodyParser = require("body-parser");
 mongoose.connect("mongodb+srv://public:123@cluster0-baim8.gcp.mongodb.net/community_levels?retryWrites=true", { useNewUrlParser: true })
 var Schema = mongoose.Schema;
 var levelSchema = new Schema({
+    title: String,
     type: String,
     map: String,
     level: [String],
+    objects: Object,
     creator: String,
     difficulty: Number
 })
@@ -55,6 +57,8 @@ app.get("/levels/new", function(req, res){
 app.post("/levels/new", function(req, res){
     var b = req.body;
     var newLevel = {
+        title:b.title||"Untitled Level",
+        objects: b.objects||{},
         type: b.type||"null",
         map: b.map||"",
         level: b.level||[],
