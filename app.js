@@ -65,13 +65,43 @@ app.post("/levels/new", function(req, res){
         creator: b.creator||"Anonymous",
         difficulty: Math.min(Math.max(b.difficulty||1,1),10)
     }
-    Level.create(newLevel, function(err, newLvl){
-        if(err){
-            console.log(err);
-        } else {
-            res.send(newLvl);
-        }
-    });
+    if(b._id){
+        Level.find({_id:b._id}, function(err, levels){
+            if(err) {
+                console.warn("Error finding match")
+                console.warn(err);
+                return;
+            }
+            if(!levels.length){
+                Level.create(newLevel, function(err, newLvl){
+                    if(err){
+                        console.warn("Error adding level")
+                        console.warn(err);
+                    } else {
+                        res.send(newLvl);
+                    }
+                });
+            } else {
+                Level.updateOne({_id:b._id}, newLevel, function(err, updatedLevel){
+                    if(err){
+                        console.warn("Error Updating Level")
+                        console.warn(err);
+                    } else {
+                        res.send(updatedLevel);
+                    }
+                });
+            }
+        })
+    } else {
+        Level.create(newLevel, function(err, newLvl){
+            if(err){
+                console.warn("Error adding level")
+                console.warn(err);
+            } else {
+                res.send(newLvl);
+            }
+        });
+    }
 });
 
 // Run
