@@ -3,6 +3,7 @@ var mongoose = require("mongoose");
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
+var http = require("http");
 
 // Mongoose
 mongoose.connect("mongodb+srv://public:123@cluster0-baim8.gcp.mongodb.net/community_levels?retryWrites=true", { useNewUrlParser: true })
@@ -109,3 +110,7 @@ var app_port = process.env.PORT || 8080;
 app.listen(app_port, process.env.IP, function(){
     console.log("API app started on port "+app_port);
 })
+
+setInterval(function(){
+    http.get("http://escape-from-earth.herokuapp.com");
+}, 250000)
