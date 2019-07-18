@@ -82,7 +82,7 @@ app.post("/levels/new", function(req, res){
                     }
                 });
             } else {
-                Level.updateOne({_id:b._id}, newLevel, function(err, updatedLevel){
+                Level.updateOne({_id:b._id}, {$set: newLevel}, function(err, updatedLevel){
                     if(err){
                         console.warn("Error Updating Level")
                         console.warn(err);
