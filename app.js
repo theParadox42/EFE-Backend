@@ -111,6 +111,9 @@ app.listen(app_port, process.env.IP, function(){
     console.log("API app started on port "+app_port);
 })
 
+/* took up too many Heroku hours
 setInterval(function(){
     http.get("http://escape-from-earth.herokuapp.com");
 }, 250000)
+*/
+
