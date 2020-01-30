@@ -1,23 +1,15 @@
 // Dependencies
-var mongoose = require("mongoose");
-var express = require("express");
-var app = express();
-var bodyParser = require("body-parser");
-var http = require("http");
+var _ = require("dotenv").config();
+    express         = require("express"),
+    app             = express(),
+    mongoose        = require("mongoose"),
+    mongooseConfig  = require("./utilities/mongoose-config"),
+    bodyParser      = require("body-parser"),
+    Level           = require("./models/level"),
+    User            = require("./models/user");
 
 // Mongoose
-mongoose.connect("mongodb+srv://public:123@cluster0-baim8.gcp.mongodb.net/community_levels?retryWrites=true", { useNewUrlParser: true })
-var Schema = mongoose.Schema;
-var levelSchema = new Schema({
-    title: String,
-    type: String,
-    map: String,
-    level: [String],
-    objects: Object,
-    creator: String,
-    difficulty: Number
-})
-var Level = mongoose.model("Level", levelSchema);
+mongoose.connect(mongooseConfig.string, mongooseConfig.constructor);
 
 // CORS
 var allowCrossDomain = function(req, res, next) {
@@ -34,43 +26,42 @@ var allowCrossDomain = function(req, res, next) {
     }
 };
 app.use(allowCrossDomain);
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({ extended:true }));
 
 // Get
-app.get("/", function(req, res){
-    res.redirect("https://escapefromearth.tk")
+app.get("/", function(req, res){ 
+    res.send("")
 })
 app.get("/levels", function(req, res){
     Level.find({}, function(err, levels){
         if(err) {
             console.log("Error Getting Levels: " + err);
-            res.send("Error");
+            res.status(400).send("Error");
         } else {
-            res.send(levels);
+            res.status(200).send(levels);
         }
     })
 });
-app.get("/levels/new", function(req, res){
-    res.render("newLevel.ejs");
+app.get("*", function(req, res) {
+    res.send("404, Path Not Registered");
 });
-
 // Post
 app.post("/levels/new", function(req, res){
     var b = req.body;
     var newLevel = {
-        title:b.title||"Untitled Level",
-        objects: b.objects||{},
-        type: b.type||"null",
-        map: b.map||"",
-        level: b.level||[],
-        creator: b.creator||"Anonymous",
+        title: b.title || "Untitled Level",
+        objects: b.objects || {},
+        type: b.type || "null",
+        map: b.map || "",
+        level: b.level || [],
+        creator: b.creator || "Anonymous",
         difficulty: Math.min(Math.max(b.difficulty||1,1),10)
     }
     if(b._id){
-        Level.find({_id:b._id}, function(err, levels){
+        // Check if should update
+        Level.find({ _id: b._id }, function(err, levels){
             if(err) {
-                console.warn("Error finding match")
-                console.warn(err);
+                res.status(400)
                 return;
             }
             if(!levels.length){
@@ -92,7 +83,7 @@ app.post("/levels/new", function(req, res){
                     }
                 });
             }
-        })
+        });
     } else {
         Level.create(newLevel, function(err, newLvl){
             if(err){
@@ -105,15 +96,10 @@ app.post("/levels/new", function(req, res){
     }
 });
 
-// Run
+//=================
+//==== RUN APP ====
+//=================
 var app_port = process.env.PORT || 8080;
 app.listen(app_port, process.env.IP, function(){
     console.log("API app started on port "+app_port);
-})
-
-/* took up too many Heroku hours
-setInterval(function(){
-    http.get("http://escape-from-earth.herokuapp.com");
-}, 250000)
-*/
-
+});
