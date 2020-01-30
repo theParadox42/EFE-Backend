@@ -4,6 +4,7 @@ var _ = require("dotenv").config();
     app             = express(),
     mongoose        = require("mongoose"),
     mongooseConfig  = require("./utilities/mongoose-config"),
+    allowCrossDomain= require("./middleware/bad-security"),
     bodyParser      = require("body-parser"),
     Level           = require("./models/level"),
     User            = require("./models/user");
@@ -12,19 +13,6 @@ var _ = require("dotenv").config();
 mongoose.connect(mongooseConfig.string, mongooseConfig.constructor);
 
 // CORS
-var allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-
-    // intercept OPTIONS method
-    if ('OPTIONS' == req.method) {
-      res.send(200);
-    }
-    else {
-      next();
-    }
-};
 app.use(allowCrossDomain);
 app.use(bodyParser.urlencoded({ extended:true }));
 
