@@ -28,7 +28,7 @@ app.get("/levels", function(req, res){
         } else {
             res.status(200).send(levels);
         }
-    })
+    });
 });
 app.get("*", function(req, res) {
     res.send("404, Path Not Registered");
