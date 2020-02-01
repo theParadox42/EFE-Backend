@@ -69,7 +69,7 @@ module.exports = function(body){
             });
         break;
         case "space":
-            
+            console.log("test");
             if (!validateObject(levelData.objects) || 
                 typeof levelData.width != "number" ||
                 levelData.width < 1) return null;
