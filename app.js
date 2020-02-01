@@ -6,7 +6,9 @@ var _ = require("dotenv").config();
     mongooseConfig  = require("./utilities/mongoose-config"),
     allowCrossDomain= require("./middleware/bad-security"),
     bodyParser      = require("body-parser"),
-    levelRoutes     = require("./routes/levels");
+    levelRoutes     = require("./routes/levels"),
+    authRoutes      = require("./routes/users"),
+    indexRoutes     = require("./routes/index");
 
 // Mongoose
 mongoose.connect(mongooseConfig.string, mongooseConfig.constructor);
@@ -16,8 +18,9 @@ app.use(allowCrossDomain);
 app.use(bodyParser.urlencoded({ extended:true }));
 
 // Routes
+app.use(authRoutes);
 app.use("/levels", levelRoutes);
-
+app.use(indexRoutes);
 
 //=================
 //==== RUN APP ====
