@@ -34,7 +34,7 @@ module.exports = function(body){
         typeof body.title != "string" || 
         typeof body.type != "string" ||
         !validateObject(body.creator, ["_id", "username"])) return null;
-    
+
     var newLevel = {
         title: body.title,
         type: body.type,
@@ -43,9 +43,9 @@ module.exports = function(body){
         levelData: {}
     };
 
-    var levelData = levelData;
+    var levelData = body.levelData;
     if(!validateObject(levelData)) return null;
-    
+
     switch(body.type) {
         case "run":
             if (!levelData.map ||
@@ -56,11 +56,13 @@ module.exports = function(body){
         case "build":
             // Basic stuff
             if(!validateArray(levelData.map, 1)) return null;
+            console.log("got here")
             // Check individual lines
             var arrayCheck = false;
             levelData.map.forEach(element => {
                 if(typeof element != "string" || element.length > 1) arrayCheck = true;
             });
+            console.log("got here2");
             if(arrayCheck) return null;
             newLevel.levelData.map = [];
             levelData.map.forEach(element => {

@@ -4,7 +4,7 @@
   "description": "Backend escape from earth",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha tests/level-validator-test.js",
     "start": "node app.js",
     "run": "node app.js",
     "dev": "nodemon app.js"
@@ -22,7 +22,9 @@
     "moment": "^2.24.0",
     "mongoose": "^5.7.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^7.0.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/theParadox42/escape-from-earth-backend.git"

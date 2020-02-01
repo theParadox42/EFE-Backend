@@ -1,4 +1,7 @@
 
+var levelValidator = require("../utilities/validate-level"),
+    assert = require("assert");
+
 // A bunch of levels that should pass
 
 var runLevel = {
@@ -15,7 +18,7 @@ var runLevel = {
 };
 
 var buildLevel = {
-    title: "Epic Run Level Test",
+    title: "Epic Platformer Level Test",
     type: "build",
     creator: {
         username: "Test",
@@ -90,3 +93,33 @@ var marsLevel = {
     }
 };
 
+function runTestsOnArray(arr, inverted) {
+
+    arr.forEach(level => {
+        it(level.title, function () {
+            var valid = levelValidator(level);
+            if(inverted) valid = !valid;
+            assert.equal(valid && true, true);
+        });
+    });
+}
+
+var passLevels = [runLevel, buildLevel, spaceLevel, marsLevel];
+describe("Passable Level Tests", function () {
+    runTestsOnArray(passLevels);
+});
+
+// A bunch of levels that by failing pass
+var typeFailLevel = {
+    title: "Yeet",
+    type: "FAIL HERE",
+    creator: {
+        username: "Test",
+        _id: "abunchofrandomlettersandnumbers123"
+    },
+}
+
+var failLevels = [typeFailLevel];
+describe("Failure Level Tests", function() {
+    runTestsOnArray(failLevels, true);
+})
