@@ -78,6 +78,8 @@ module.exports = function(body){
             var ufoArray = validateArrayOfPositionalObjects(levelData.objects.ufos);
             var bossArray = validateArrayOfPositionalObjects(levelData.objects.bosses);
             
+            console.log(asteroidArray && true);
+            console.log(ufoArray && true);
             if(!(asteroidArray && ufoArray && bossArray)) return null;
 
             newLevel.levelData = {
