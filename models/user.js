@@ -1,7 +1,8 @@
 
-var mongoose    = require("mongoose"),
-    moment      = require("moment"),
-    jwt         = require("jsonwebtoken");
+var mongoose                = require("mongoose"),
+    passportLocalMongoose   = require("passport-local-mongoose");
+    moment                  = require("moment"),
+    jwt                     = require("jsonwebtoken");
 
 var userSchema = new mongoose.Schema({
     username: {
@@ -50,12 +51,14 @@ userSchema.virtual("sinceCreated").get(function() {
     return moment(this.createdAt).fromNow();
 });
 
-UserSchema.methods.newAuthToken = async function () {
+userSchema.methods.generateToken = function () {
     var user = this;
     var token = jwt.sign({ id: user.id.toString() }, process.env.SECRET, { expiresIn: "7 days" });
-    user.tokens = user.tokens.concat({ token })
-    await user.save()
-    return token
+    user.tokens = user.tokens.concat({ token });
+    user.save();
+    return token;
 };
+
+userSchema.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model("User", userSchema);
