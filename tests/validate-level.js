@@ -6,32 +6,31 @@ var spaceLevel = {
     type: "space",
     creator: "Example",
     difficulty: 2,
-    objects: {
+    levelData: {
         width: 500,
         ufos: [
             {
                 x: 120,
                 y: 40,
-                width: 25
+                size: 25
             }
         ],
         asteroids: [
             {
                 x: 120,
                 y: 40,
-                width: 25
+                size: 25
             }
         ],
         boss: [
             {
                 x: 60,
                 y: 40,
-                width: 25
+                size: 25
             }
         ]
     }
 }
-
 
 var marsLevel = {
     title: "Epic Space Level 101 Test",

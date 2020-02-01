@@ -6,9 +6,19 @@ var express         = require("express"),
     sendJSON        = require("../utilities/send-json"),
     validateLevel   = require("../utilities/validate-level");
 
+// CREATE Level
+function createLevel(res, levelBody) {
+    Level.create(levelBody, function (err, createdLevel) {
+        if (err) {
+            sendJSON(res, "error", { message: "Error creating level", error: err }, 500);
+        } else {
+            sendJSON(res, "level", createdLevel, 201);
+        }
+    });
+}
 
 // GET Levels
-router.get("/levels", function (req, res) {
+router.get("/", function (req, res) {
     Level.find({}, function (err, levels) {
         if (err) {
             sendJSON(res, "error", { message: "An error occurred retrieving levels", error: err }, 500);
@@ -19,10 +29,11 @@ router.get("/levels", function (req, res) {
 });
 
 // POST New/Update Level
-router.post("/levels/new", function (req, res) {
+router.post("/new", function (req, res) {
 
-    // Basically validate that the request contains level information
+    // Basically validate that the request contains level information formatted correctly
     var newLevel = validateLevel(req.body);
+
     if (!newLevel) return sendJSON(res, "error", { message: "Level formatted incorrectly", error: "Bad level request" }, 400);
 
     // Check if should update
@@ -46,13 +57,5 @@ router.post("/levels/new", function (req, res) {
     } else createLevel(res, newLevel);
 });
 
-// CREATE Level
-function createLevel(res, levelBody) {
-    Level.create(levelBody, function (err, createdLevel) {
-        if (err) {
-            sendJSON(res, "error", { message: "Error creating level", error: err }, 500);
-        } else {
-            sendJSON(res, "level", createdLevel, 201);
-        }
-    });
-}
+
+module.exports = router;

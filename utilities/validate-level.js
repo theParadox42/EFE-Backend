@@ -7,11 +7,23 @@ function validateArray(arr, minValue){
 
 function validateObject(obj, requiredComponents) {
     var validated = typeof obj == "object";
-    if(validated) {
+
+    if (validated && typeof requiredComponents == "object") {
         requiredComponents.forEach(element => {
             if(typeof obj[element] == "undefined") validated = false;
         });
     }
+
+    return validated;
+}
+
+function validateArrayOfPositionalObjects(arr) {
+    if(!validateArray(arr)) return [];
+
+    var validated = arr;
+    arr.forEach(positionalObject => {
+        if(!validateObject(positionalObject, ["x", "y", "size"])) validated = false;
+    })
 
     return validated;
 }
@@ -27,47 +39,59 @@ module.exports = function(body){
         title: body.title,
         type: body.type,
         creator: body.creator,
-        difficulty: Math.min(Math.max(parseInt(body.difficulty), 1), 5)
+        difficulty: Math.min(Math.max(parseInt(body.difficulty), 1), 5),
+        levelData: {}
     };
+
+    var levelData = levelData;
+    if(!validateObject(levelData)) return null;
     
     switch(body.type) {
         case "run":
-            if(!body.map) return null;
-            if(typeof body.map != "string") return null;
-            if(body.map.length < 1) return null;
-            newLevel.map = body.map;
+            if (!levelData.map ||
+                typeof levelData.map != "string" ||
+                levelData.map.length < 1) return null;
+            newLevel.levelData.map = levelData.map;
         break;
         case "build":
             // Basic stuff
-            if(!validateArray(body.level, 1)) return null;
+            if(!validateArray(levelData.map, 1)) return null;
             // Check individual lines
             var arrayCheck = false;
-            body.level.forEach(element => {
+            levelData.map.forEach(element => {
                 if(typeof element != "string" || element.length > 1) arrayCheck = true;
             });
             if(arrayCheck) return null;
-            newLevel.level = [];
-            body.level.forEach(element => {
-                newLevel.level.push(element);
+            newLevel.levelData.map = [];
+            levelData.map.forEach(element => {
+                newLevel.levelData.map.push(element);
             });
         break;
         case "space":
-            if (!validateObject(body.objects, ["width"]) || 
-                typeof body.objects.width != "number" || body.objects.width > 0 ||
-                !validateArray(body.objects.asteroids) || !validateArray(body.objects.ufos)) return null;
-            newLevel.level = {
-                width: body.objects.width,
-                asteroids: validateArray(body.objects.asteroids) ? body.objects.asteroids : [],
-                ufos: validateArray(body.objects.ufos) ? body.objects.ufos : [],
-                bosses: validateArray(body.objects.bosses) ? body.objects.bosses : []
+            
+            if (!validateObject(levelData.objects) || 
+                typeof levelData.levelData.width != "number" ||
+                levelData.levelData.width < 1) return null;
+            
+            var asteroidArray = validateArrayOfPositionalObjects(levelData.objects.asteroids);
+            var ufoArray = validateArrayOfPositionalObjects(levelData.objects.ufos);
+            var bossArray = validateArrayOfPositionalObjects(levelData.objects.bosses);
+            
+            if(!(asteroidArray && ufoArray && bossArray)) return null;
+
+            newLevel.levelData = {
+                width: levelData.width,
+                objects: {
+                    asteroids: asteroidArray,
+                    ufos: ufoArray,
+                    bosses: bossArray
+                }
             }
         break;
         case "mars": 
-            if (!validateObject(body.objects, ["blocks"]) ||
-                !validateArray(body.objects.blocks)) return null;
-            newLevel.level = {
-                blocks: validateArray(body.objects.blocks) ? body.objects.blocks : []
-            };
+            var blocksArray = validateArrayOfPositionalObjects(levelData.blocks);
+            if(!blocksArray) return null;
+            newLevel.levelData.blocks = blocksArray;
         break;
         default:
             return null;
