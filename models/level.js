@@ -1,7 +1,8 @@
 
-// A very simple document
+// How a level is formatted via mongoose
 
-var mongoose = require("mongoose");
+var mongoose    = require("mongoose"),
+    moment      = require("moment");
 
 var levelSchema = new mongoose.Schema({
     title: {
@@ -9,21 +10,23 @@ var levelSchema = new mongoose.Schema({
         required: true,
         min: 1
     },
-    type: String,
-    levelData: mongoose.Schema.Types.Mixed,
-    creator: String,
-    difficulty: Number,
-    createdAt: {
-        type: Date,
-        default: Date.now
+    type: {
+        type: String,
+        required: true,
+        enum: ["run", "build", "space", "mars"]
     },
-    sinceCreated: String,
+    levelData: mongoose.Schema.Types.Mixed,
+    difficulty: Number,
     creator: {
         username: String,
         id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         },
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     },
     meta: {
         featured: {
@@ -35,5 +38,11 @@ var levelSchema = new mongoose.Schema({
         flags: Number
     },
 });
+
+
+levelSchema.virtual("sinceCreated").get(function () {
+    return moment(this.createdAt).fromNow();
+});
+
 
 module.exports = mongoose.model("Level", levelSchema);

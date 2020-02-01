@@ -1,5 +1,6 @@
 
-var mongoose = require("mongoose"),
+var mongoose    = require("mongoose"),
+    moment      = require("moment");
 
 var userSchema = new mongoose.Schema({
     username: {
@@ -17,7 +18,6 @@ var userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    sinceCreated: String,
     levels: [
         {
             id: {
@@ -36,6 +36,8 @@ var userSchema = new mongoose.Schema({
     }
 });
 
-
+userSchema.virtual("sinceCreated").get(function() {
+    return moment(this.createdAt).fromNow();
+});
 
 module.exports = mongoose.model("User", userSchema);
