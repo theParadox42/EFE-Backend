@@ -51,27 +51,29 @@ var spaceLevel = {
     difficulty: 3,
     levelData: {
         width: 500,
-        /* asteroids: [
-            {
-                x: 120,
-                y: 40,
-                size: 25
-            }
-        ], */
-        ufos: [
-            {
-                x: 120,
-                y: 40,
-                size: 25
-            }
-        ],
-        boss: [
-            {
-                x: 60,
-                y: 40,
-                size: 25
-            }
-        ]
+        objects: {
+            /* asteroids: [
+                {
+                    x: 120,
+                    y: 40,
+                    size: 25
+                }
+            ], */
+            ufos: [
+                {
+                    x: 120,
+                    y: 40,
+                    size: 25
+                }
+            ],
+            boss: [
+                {
+                    x: 60,
+                    y: 40,
+                    size: 25
+                }
+            ]
+        }
     }
 };
 

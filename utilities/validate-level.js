@@ -69,7 +69,7 @@ module.exports = function(body){
             });
         break;
         case "space":
-            console.log("test");
+            
             if (!validateObject(levelData.objects) || 
                 typeof levelData.width != "number" ||
                 levelData.width < 1) return null;
@@ -78,8 +78,6 @@ module.exports = function(body){
             var ufoArray = validateArrayOfPositionalObjects(levelData.objects.ufos);
             var bossArray = validateArrayOfPositionalObjects(levelData.objects.bosses);
             
-            console.log(asteroidArray && true);
-            console.log(ufoArray && true);
             if(!(asteroidArray && ufoArray && bossArray)) return null;
 
             newLevel.levelData = {
