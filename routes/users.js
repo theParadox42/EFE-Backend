@@ -8,14 +8,17 @@ var express         = require("express"),
 
 router.post("/register", function(req, res) {
     // TODO
+    sendJSON(res, "error", { message "Not Yet Implemented" }, 301);
 });
 
 router.post("/login", function(req, res) {
     // TODO
+    sendJSON(res, "error", { message "Not Yet Implemented" }, 301);
 });
 
 router.get("/user/:id", function(req, res) {
     // TODO
+    sendJSON(res, "error", { message "Not Yet Implemented" }, 301);
 });
 
 module.exports = router;
