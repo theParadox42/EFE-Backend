@@ -56,13 +56,12 @@ module.exports = function(body){
         case "build":
             // Basic stuff
             if(!validateArray(levelData.map, 1)) return null;
-            console.log("got here")
+            
             // Check individual lines
             var arrayCheck = false;
             levelData.map.forEach(element => {
-                if(typeof element != "string" || element.length > 1) arrayCheck = true;
+                if(typeof element != "string" || element.length < 1) arrayCheck = true;
             });
-            console.log("got here2");
             if(arrayCheck) return null;
             newLevel.levelData.map = [];
             levelData.map.forEach(element => {
@@ -72,8 +71,8 @@ module.exports = function(body){
         case "space":
             
             if (!validateObject(levelData.objects) || 
-                typeof levelData.levelData.width != "number" ||
-                levelData.levelData.width < 1) return null;
+                typeof levelData.width != "number" ||
+                levelData.width < 1) return null;
             
             var asteroidArray = validateArrayOfPositionalObjects(levelData.objects.asteroids);
             var ufoArray = validateArrayOfPositionalObjects(levelData.objects.ufos);
