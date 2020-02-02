@@ -1,6 +1,7 @@
 
 var express         = require("express"),
     router          = express.Router({ mergeParams: true }),
+    mongoose        = require("mongoose"),
     passport        = require("passport"),
     User            = require("../models/user"),
     sendJSON        = require("../utilities/send-json"),
@@ -33,12 +34,8 @@ router.post("/register", function(req, res) {
             return sendJSON(res, "error", { message: "Username Taken" }, 400);
         }
         
-        console.log(newUser);
-
         User.register(newUser, body.password, function (err, createdUser) {
             if (err) {
-                console.log(createdUser);
-                console.log(err);
                 return sendJSON(res, "error", { message: "Error creating user", error: err }, 500);
             }
             passport.authenticate("local")(req, res, function () {
@@ -52,18 +49,62 @@ router.post("/register", function(req, res) {
 
 });
 
-router.post("/login", function(req, res) {
-    // TODO
-    sendJSON(res, "error", { message: "Not Yet Implemented" }, 301);
+router.post("/login", function(req, res, next) {
+
+    // Check if user is already logged in
+    authMiddlware.getUser(req, res, function(_, user) {
+
+        var user = req.user
+        if (user) {
+            return sendJSON(res, "success", { 
+                message: "User already validated", 
+                token: req.user.newAuthToken(), 
+                user: user
+            });
+        }
+        
+        // Local Auth
+        var localAuthenticator = passport.authenticate('local', function (err, foundUser) {
+            if (err) {
+                return sendJSON(res, "error", { message: "Error Authenticating", error: err, user: foundUser }, 400);
+            }
+            if (!foundUser) {
+                return sendJSON(res, "error", { message: "Invalid Credentials", error: "No user authenticated" }, 400);
+            }
+            var token = foundUser.generateToken();
+            return sendJSON(res, "success", { message: "Successfully logged in.", token: token, user: foundUser });
+        });
+        localAuthenticator(req, res, next);
+    });
+
 });
 
-router.get("/profile", authMiddlware.loggedIn, function(req, res) {
-    sendJSON(res, "user", req.user);
+function sendProfile(req, res, foundUser) {
+    foundUser.populate("levels").exec(function (err, foundUser) {
+        console.log(foundUser.sinceCreated);
+        if (err) {
+            sendJSON(res, "error", { message: "Error Finding User", error: err }, 500)
+        } else if (foundUser) {
+            var sendUser = foundUser;
+            sendUser.tokens = [];
+            sendUser.sinceCreated = foundUser.sinceCreated;
+            sendJSON(res, "success",
+                {
+                    message: "Successfully found user!",
+                    user: sendUser
+                });
+        } else {
+            sendJSON(res, "error", { message: "No User Found!", error: "Not Found" }, 400);
+        }
+    });
+}
+
+router.get("/profile", authMiddlware.loggedIn, function (req, res) {
+    sendProfile(req, res, User.findById(req.user._id));
 });
 
-router.get("/profile/:id", function(req, res) {
-    // TODO
-    sendJSON(res, "error", { message: "Not Yet Implemented" }, 301);
+router.get("/profile/:username", function(req, res) {
+    sendProfile(req, res, User.findOne({ username: req.params.username }));
 });
 
 module.exports = router;
