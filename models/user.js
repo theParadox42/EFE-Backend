@@ -21,6 +21,7 @@ var userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    sinceCreated: String,
     levels: [
         {
             id: {
@@ -47,7 +48,7 @@ var userSchema = new mongoose.Schema({
     ]
 });
 
-userSchema.virtual("sinceCreated").get(function() {
+userSchema.path("sinceCreated").get(function() {
     return moment(this.createdAt).fromNow();
 });
 

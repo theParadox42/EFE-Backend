@@ -28,6 +28,7 @@ var levelSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    sinceCreated: String,
     meta: {
         featured: {
             type: Boolean,
@@ -40,7 +41,7 @@ var levelSchema = new mongoose.Schema({
 });
 
 
-levelSchema.virtual("sinceCreated").get(function () {
+levelSchema.path("sinceCreated").get(function () {
     return moment(this.createdAt).fromNow();
 });
 

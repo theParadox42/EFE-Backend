@@ -2,8 +2,10 @@
 var express         = require("express"),
     router          = express.Router({ mergeParams: true }),
     mongoose        = require("mongoose"),
+    User            = require("../models/user"),
     Level           = require("../models/level"),
     sendJSON        = require("../utilities/send-json"),
+    authMiddleware  = require("../middleware/auth"),
     validateLevel   = require("../utilities/validate-level");
 
 // CREATE Level
@@ -28,8 +30,8 @@ router.get("/", function (req, res) {
     });
 });
 
-// POST New/Update Level
-router.post("/new", function (req, res) {
+// CREATE Campground
+router.post("/", authMiddleware.loggedIn,function (req, res) {
 
     // Basically validate that the request contains level information formatted correctly
     var newLevel = validateLevel(req.body);
@@ -55,6 +57,11 @@ router.post("/new", function (req, res) {
             }
         });
     } else createLevel(res, newLevel);
+});
+
+// UPDATE Level
+router.put("/:id", authMiddleware.ownsLevel, function(req, res) {
+
 });
 
 

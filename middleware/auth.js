@@ -2,46 +2,53 @@
 // Some AUTH middleware
 
 var sendJSON    = require("../utilities/send-json"),
-    passport    = require("passport"),
     User        = require("../models/user");
 
 
 function getUser(req, res, callback) {
     
     // Check if user already exists
-    if(req.isAuthenticated()) return callback();
-    
+    if(req.isAuthenticated() && req.user) return callback(null, req.user);
+
     try {
 
         var token = req.header('Authorization').replace('Bearer', '').trim();
         var decoded = jwt.verify(token, process.env.SECRET);
         
-        User.findOne({ _id: decoded.id }, function(err, foundUser) {
+        User.findOne({ _id: decoded.id, "tokens.token": token }, function(err, foundUser) {
             
             if(err) {
-                return sendJSON(res, "error", { message: "Error finding associated user", error: err }, 500);
+                return callback(err)
             }
             if (!foundUser) {
-                return sendJSON(res, "error", { message: "No User found, check auth", error: "Empty User", user: foundUser}, 400);
+                return callback(null, false);
             }
             req.token = token;
             req.user = foundUser;
-            callback(foundUser);
+            return callback(null, foundUser);
         });
 
     } catch (err) {
-        sendJSON(res, "error", { message: "Bad Authorization", error: err }, 400);
+        callback(err)
     }
 
 }
 
 var middleware = {
+    getUser: getUser,
     loggedIn: function(req, res, next) {
-        getUser(req, res, function(user) {
-            next();
+        getUser(req, res, function(err, user) {
+            if(err) {
+                sendJSON(res, "error", { message: "Bad Auth Request", error: err }, 400);
+            } else if(!user) {
+                sendJSON(res, "error", { message: "Unauthorized Request", error: "Empty User" }, 400);
+            } else {
+                next();
+            }
         });
     },
-    test: function(req, res, next) {
+    ownsLevel: function(req, res, next) {
+        // TODO
         next();
     }
 }
