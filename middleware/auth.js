@@ -9,8 +9,6 @@ function getUser(req, res, callback) {
     
     // Check if user already exists
     if(req.isAuthenticated() && req.user) return callback(null, req.user);
-    
-    console.log("okay");
 
     try {
 
@@ -49,7 +47,8 @@ var middleware = {
             }
         });
     },
-    test: function(req, res, next) {
+    ownsLevel: function(req, res, next) {
+        // TODO
         next();
     }
 }
