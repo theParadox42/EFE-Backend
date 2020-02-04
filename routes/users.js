@@ -40,12 +40,11 @@ router.post("/register", function(req, res) {
             }
             passport.authenticate("local")(req, res, function () {
                 var token = createdUser.generateToken();
-                sendJSON(res, "success", { message: "Successfully Registered!", token: token, user: createdUser }, 201);
+                sendJSON(res, "success", { message: "Successfully Registered!", token: token, user: createdUser.getNiceVersion() }, 201);
             });
+        });
 
-        })
-
-    })
+    });
 
 });
 
@@ -59,20 +58,20 @@ router.post("/login", function(req, res, next) {
             return sendJSON(res, "success", { 
                 message: "User already validated", 
                 token: req.user.newAuthToken(), 
-                user: user
+                user: user.getNiceVersion()
             });
         }
         
         // Local Auth
         var localAuthenticator = passport.authenticate('local', function (err, foundUser) {
             if (err) {
-                return sendJSON(res, "error", { message: "Error Authenticating", error: err, user: foundUser }, 400);
+                return sendJSON(res, "error", { message: "Error Authenticating", error: err, user: foundUser.getNiceVersion() }, 400);
             }
             if (!foundUser) {
                 return sendJSON(res, "error", { message: "Invalid Credentials", error: "No user authenticated" }, 400);
             }
             var token = foundUser.generateToken();
-            return sendJSON(res, "success", { message: "Successfully logged in.", token: token, user: foundUser });
+            return sendJSON(res, "success", { message: "Successfully logged in.", token: token, user: foundUser.getNiceVersion() });
         });
         localAuthenticator(req, res, next);
     });
@@ -85,13 +84,10 @@ function sendProfile(req, res, foundUser) {
         if (err) {
             sendJSON(res, "error", { message: "Error Finding User", error: err }, 500)
         } else if (foundUser) {
-            var sendUser = foundUser;
-            sendUser.tokens = [];
-            sendUser.sinceCreated = foundUser.sinceCreated;
             sendJSON(res, "success",
                 {
                     message: "Successfully found user!",
-                    user: sendUser
+                    user: foundUser.getNiceVersion()
                 });
         } else {
             sendJSON(res, "error", { message: "No User Found!", error: "Not Found" }, 400);

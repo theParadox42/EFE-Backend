@@ -2,7 +2,8 @@
 var mongoose                = require("mongoose"),
     passportLocalMongoose   = require("passport-local-mongoose");
     moment                  = require("moment"),
-    jwt                     = require("jsonwebtoken");
+    jwt                     = require("jsonwebtoken"),
+    randomStringGenerator   = require("crypto-random-string");
 
 var userSchema = new mongoose.Schema({
     username: {
@@ -53,11 +54,19 @@ userSchema.path("sinceCreated").get(function() {
 });
 
 userSchema.methods.generateToken = function () {
-    var user = this;
-    var token = jwt.sign({ id: user.id.toString() }, process.env.SECRET, { expiresIn: "7 days" });
-    user.tokens = user.tokens.concat({ token });
-    user.save();
+    // Really just a random string that has no purpose but to make tokens more asthetically pleasing
+    var key = randomStringGenerator({ length: 20, type: "base64" });
+    var token = jwt.sign({ id: this.id.toString(), key: key }, process.env.SECRET, { expiresIn: "7 days" });
+    this.tokens = this.tokens.concat({ token });
+    this.save();
     return token;
+};
+
+userSchema.methods.getNiceVersion = function () {
+    var niceVersion = this;
+    niceVersion.sinceCreated = this.sinceCreated;
+    niceVersion.tokens = [];
+    return niceVersion;
 };
 
 userSchema.plugin(passportLocalMongoose);
