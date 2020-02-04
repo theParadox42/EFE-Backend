@@ -80,7 +80,6 @@ router.post("/login", function(req, res, next) {
 
 function sendProfile(req, res, foundUser) {
     foundUser.populate("levels").exec(function (err, foundUser) {
-        console.log(foundUser.sinceCreated);
         if (err) {
             sendJSON(res, "error", { message: "Error Finding User", error: err }, 500)
         } else if (foundUser) {
