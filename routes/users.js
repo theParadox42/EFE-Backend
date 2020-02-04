@@ -1,7 +1,7 @@
 
 var express         = require("express"),
     router          = express.Router({ mergeParams: true }),
-    mongoose        = require("mongoose"),
+    // mongoose        = require("mongoose"),
     passport        = require("passport"),
     User            = require("../models/user"),
     sendJSON        = require("../utilities/send-json"),

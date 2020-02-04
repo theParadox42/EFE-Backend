@@ -41,15 +41,29 @@ var middleware = {
                 next();
             }
         });
-    },
-    ownsLevel: function(req, res, next) {
-        
-        Level.findById(req.params.levelid, function(err, foundLevel) {
-
-        });
-
-        next();
     }
+};
+middleware.canEditLevel = function (req, res, next) {
+
+    middleware.loggedIn(req, res, function () {
+        Level.findById(req.params.levelid, function (err, foundLevel) {
+            if (err) {
+                sendJSON(res, "error", { message: "Error finding level", error: err }, 400);
+            } else if (!foundLevel) {
+                sendJSON(res, "error", { message: "No level found, it probably doesn't exist" }, 400);
+            } else {
+                if (foundLevel.author.id.equals(req.user._id) || req.user.adminPowers >= 1) {
+                    next();
+                }
+            }
+        });
+    });
 }
+// middleware.canDeleteLevel = function (req, res, next) {
+
+// };
+// middleware.isAdmin = function(req, res, next) {
+
+// }
 
 module.exports = middleware;

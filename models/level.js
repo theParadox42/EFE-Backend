@@ -34,9 +34,22 @@ var levelSchema = new mongoose.Schema({
             type: Boolean,
             default: false
         },
-        likes: Number,
-        dislikes: Number,
-        flags: Number
+        published: {
+            type: Boolean,
+            default: false
+        },
+        likes: {
+            type: Number,
+            default: 0
+        },
+        dislikes: {
+            type: Number,
+            default: 0
+        },
+        flags: {
+            type: Number,
+            default: 0
+        },
     },
 });
 
@@ -44,6 +57,12 @@ var levelSchema = new mongoose.Schema({
 levelSchema.path("sinceCreated").get(function () {
     return moment(this.createdAt).fromNow();
 });
+
+levelSchema.methods.getNiceVersion = function() {
+    var niceLevel = this;
+    niceLevel.sinceCreated = this.sinceCreated;
+    return niceLevel;
+}
 
 
 module.exports = mongoose.model("Level", levelSchema);

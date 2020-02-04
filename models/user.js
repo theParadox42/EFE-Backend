@@ -25,13 +25,14 @@ var userSchema = new mongoose.Schema({
     sinceCreated: String,
     levels: [
         {
-            id: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Level"
-            },
-            title: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Level"
+        }
+    ],
+    roles: [
+        {
             type: String,
-            sinceCreated: String
+            enum: ["flexer", "honorary", "moderator", "administrator"],
         }
     ],
     meta: {
@@ -66,7 +67,24 @@ userSchema.methods.getNiceVersion = function () {
     var niceVersion = this;
     niceVersion.sinceCreated = this.sinceCreated;
     niceVersion.tokens = [];
+    for (let i = 0; i < this.levels.length; i++) {
+        niceVersion.levels[i].sinceCreated = moment(this.levels[i].createdAt).fromNow();
+    }
     return niceVersion;
+};
+
+userSchema.virtual.adminPowers = function() {
+    var maxLevel = 0;
+    this.roles.forEach(role => {
+        switch(role) {
+            case "moderator":
+                maxLevel = Math.max(maxLevel, 1);
+            break;
+            case "administrator":
+                maxLevel = Math.max(maxLevel, 2);
+            break;
+        }
+    });
 };
 
 userSchema.plugin(passportLocalMongoose);

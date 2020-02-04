@@ -32,14 +32,14 @@ module.exports = function(body){
 
     if (typeof body != "object" ||
         typeof body.title != "string" || 
-        typeof body.type != "string" ||
-        !validateObject(body.creator, ["_id", "username"])) return null;
+        typeof body.type != "string") return null;
 
     var newLevel = {
         title: body.title,
         type: body.type,
         creator: body.creator,
         difficulty: Math.min(Math.max(parseInt(body.difficulty), 1), 5) || 1,
+        published: body.published || false,
         levelData: {}
     };
 

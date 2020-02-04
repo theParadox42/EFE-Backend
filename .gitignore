@@ -1,4 +1,6 @@
+# Files to ignore
 node_modules
 .DS_Store
 .manifest
 .env
+.vscode
