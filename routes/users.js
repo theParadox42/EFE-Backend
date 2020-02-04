@@ -92,7 +92,7 @@ function sendProfile(req, res, foundUser) {
             sendJSON(res, "error", { message: "No User Found!", error: "Not Found" }, 400);
         }
     });
-}
+};
 
 router.get("/profile", authMiddlware.loggedIn, function (req, res) {
     sendProfile(req, res, User.findById(req.user._id));

@@ -44,7 +44,9 @@ var middleware = {
     },
     ownsLevel: function(req, res, next) {
         
-        Level
+        Level.findById(req.params.levelid, function(err, foundLevel) {
+
+        });
 
         next();
     }
