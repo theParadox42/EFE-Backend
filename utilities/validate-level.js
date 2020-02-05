@@ -37,7 +37,6 @@ module.exports = function(body){
     var newLevel = {
         title: body.title,
         type: body.type,
-        creator: body.creator,
         difficulty: Math.min(Math.max(parseInt(body.difficulty), 1), 5) || 1,
         published: body.published || false,
         levelData: {}

@@ -53,7 +53,7 @@ router.post("/", authMiddleware.loggedIn,function (req, res) {
 });
 
 // UPDATE Level
-router.put("/:levelid", authMiddleware.canEdit, function (req, res) {
+router.put("/:levelid", authMiddleware.canEditLevel, function (req, res) {
 
     // Basically validate that the request contains level information formatted correctly
     var updateLevel = validateLevel(req.body);
@@ -62,13 +62,13 @@ router.put("/:levelid", authMiddleware.canEdit, function (req, res) {
     }
 
     // Find and update level
-    Level.findByIdAndUpdate(b._id, { $set: updateLevel }, function (err, updatedLevel) {
+    Level.findByIdAndUpdate(req.params.levelid, { $set: updateLevel }, { new: true }, function (err, updatedLevel) {
         if (err) {
             sendJSON(res, "error", { message: "Error updating level", error: err }, 400);
         } else if(!updatedLevel) {
             sendJSON(res, "error", { message: "No level found and updated", error: "Level Not Found" }, 400);
         } else {
-            sendJSON(res, "success", { message: "Level found and updated", level: updatedLevel });
+            sendJSON(res, "success", { message: "Level found and updated", level: updatedLevel.getNiceVersion() });
         }
     });
 });

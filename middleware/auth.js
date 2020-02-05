@@ -15,7 +15,7 @@ function authUser(req, res, callback) {
     // Otherwise check for tokens
     var tokenAuthenticator = passport.authenticate("bearer", function(err, authUser, token) {
         if (err) {
-            return callback(err)
+            return callback(err);
         }
         if (!authUser) {
             return callback(null, false);
@@ -52,8 +52,10 @@ middleware.canEditLevel = function (req, res, next) {
             } else if (!foundLevel) {
                 sendJSON(res, "error", { message: "No level found, it probably doesn't exist" }, 400);
             } else {
-                if (foundLevel.author.id.equals(req.user._id) || req.user.adminPowers >= 1) {
+                if (req.user._id.equals(foundLevel.creator.id) || req.user.adminPowers >= 1) {
                     next();
+                } else {
+                    sendJSON(res, "error", { message: "Make sure you own the level first", error: "Insufficient Permissions" }, 400);
                 }
             }
         });
