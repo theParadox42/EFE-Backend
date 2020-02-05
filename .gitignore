@@ -4,3 +4,4 @@ node_modules
 .manifest
 .env
 .vscode
+ignoreme

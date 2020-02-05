@@ -73,5 +73,9 @@ router.put("/:levelid", authMiddleware.canEditLevel, function (req, res) {
     });
 });
 
+// DELETE Level
+router.delete("/:levelid", authMiddleware.canDeleteLevel, function(req, res) {
+    
+});
 
 module.exports = router;
