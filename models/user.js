@@ -56,17 +56,18 @@ userSchema.path("sinceCreated").get(function() {
 
 userSchema.methods.generateToken = function () {
     // Really just a random string that has no purpose but to make tokens more asthetically pleasing
+    var user = this;
     var key = randomStringGenerator({ length: 20, type: "base64" });
-    var token = jwt.sign({ id: this.id.toString(), key: key }, process.env.SECRET, { expiresIn: "7 days" });
-    this.tokens = this.tokens.concat({ token });
-    this.save();
+    var token = jwt.sign({ id: user.id.toString(), key: key }, process.env.SECRET, { expiresIn: "7 days" });
+    user.tokens = user.tokens.concat({ token });
+    user.save();
     return token;
 };
 
 userSchema.methods.getNiceVersion = function () {
-    var niceVersion = this;
+    var niceVersion = JSON.parse(JSON.stringify(this));
     niceVersion.sinceCreated = this.sinceCreated;
-    niceVersion.tokens = [];
+    delete niceVersion.tokens;
     for (let i = 0; i < this.levels.length; i++) {
         niceVersion.levels[i].sinceCreated = moment(this.levels[i].createdAt).fromNow();
     }

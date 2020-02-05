@@ -59,7 +59,7 @@ levelSchema.path("sinceCreated").get(function () {
 });
 
 levelSchema.methods.getNiceVersion = function() {
-    var niceLevel = this;
+    var niceLevel = JSON.parse(JSON.stringify(this));
     niceLevel.sinceCreated = this.sinceCreated;
     return niceLevel;
 }

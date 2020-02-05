@@ -20,7 +20,7 @@ router.get("/", function (req, res) {
 });
 
 // CREATE Level
-router.post("/", authMiddleware.loggedIn,function (req, res) {
+router.post("/", authMiddleware.loggedIn, function (req, res) {
 
     req.body.published = false;
 
@@ -52,8 +52,8 @@ router.post("/", authMiddleware.loggedIn,function (req, res) {
 
 });
 
-// UPDATE Level
-router.put("/:levelid", authMiddleware.canEditLevel, function (req, res) {
+// UPDATE Level (2 means admin override)
+router.put("/:levelid", authMiddleware.ownsLevel(2), function (req, res) {
 
     // Basically validate that the request contains level information formatted correctly
     var updateLevel = validateLevel(req.body);
@@ -73,9 +73,36 @@ router.put("/:levelid", authMiddleware.canEditLevel, function (req, res) {
     });
 });
 
-// DELETE Level
-router.delete("/:levelid", authMiddleware.canDeleteLevel, function(req, res) {
-    
+// DELETE Level (1 means admin/moderator override)
+router.delete("/:levelid", authMiddleware.ownsLevel(1), function(req, res) {
+    Level.findByIdAndDelete(req.params.levelid, function(err, deletedLevel) {
+        if(err) {
+            sendJSON(res, "error", { message: "Error deleting level", error: err }, 400);
+        } else if(!deletedLevel) {
+            sendJSON(res, "error", { 
+                message: "Unable to find level, it may or may not have gotten deleted",
+                error: "Level not found" 
+            }, 400);
+        } else {
+            User.findById(deletedLevel.creator.id, function (err, foundUser) {
+                if (err) {
+                    sendJSON(res, "error", { message: "Error finding associated user", error: err }, 400);
+                } else if (!foundUser) {
+                    sendJSON(res, "error", { message: "No associated user found!", error: "User not found" }, 400);
+                } else {
+                    var levelIndex = foundUser.levels.findIndex(function(userLevel) {
+                        return userLevel.toString() == deletedLevel._id.toString();
+                    });
+                    if (levelIndex > -1) {
+                        foundUser.levels.splice(levelIndex, 1);
+                        sendJSON(res, "success", { message: "Succesfully deleted level!", level: deletedLevel });
+                    } else {
+                        sendJSON(res, "error", { message: "Level doesn't exist in user data", error: "Level index not found" }, 400);
+                    }
+                }
+            });
+        }
+    });
 });
 
 module.exports = router;

@@ -43,34 +43,37 @@ var middleware = {
         });
     }
 };
-function ownsLevelOrAdminPowers(req, res, adminPowers, next) {
-    middleware.loggedIn(req, res, function () {
-        Level.findById(req.params.levelid, function (err, foundLevel) {
-            if (err) {
-                sendJSON(res, "error", { message: "Error finding level", error: err }, 400);
-            } else if (!foundLevel) {
-                sendJSON(res, "error", { message: "No level found, it probably doesn't exist" }, 400);
-            } else {
-                if (req.user._id.equals(foundLevel.creator.id) || req.user.adminPowers >= adminPowers) {
-                    next();
+middleware.ownsLevel = function(adminPowersNeeded) {
+    return function(req, res, next) {
+        middleware.loggedIn(req, res, function () {
+            Level.findById(req.params.levelid, function (err, foundLevel) {
+                if (err) {
+                    sendJSON(res, "error", { message: "Error finding level", error: err }, 400);
+                } else if (!foundLevel) {
+                    sendJSON(res, "error", { message: "No level found, it probably doesn't exist" }, 400);
                 } else {
-                    sendJSON(res, "error", { message: "Make sure you own the level first", error: "Insufficient Permissions" }, 400);
+                    if (req.user._id.equals(foundLevel.creator.id) || req.user.adminPowers >= adminPowersNeeded) {
+                        next();
+                    } else {
+                        sendJSON(res, "error", { message: "Make sure you own the level first", error: "Insufficient Permissions" }, 400);
+                    }
                 }
-            }
+            });
         });
-    });
-}
-middleware.canEditLevel = function (req, res, next) {
-    ownsLevelOrAdminPowers(req, res, 2, next);
-}
-middleware.canDeleteLevel = function (req, res, next) {
-    ownsLevelOrAdminPowers(req, res, 1, next);
+    }
 };
 middleware.isAdmin = function(req, res, next) {
     if(req.user.adminPowers >= 2) {
         next();
     } else {
         sendJSON(res, "error", { message: "Not an admin!", error: "Insufficient Permissions" }, 400);
+    }
+};
+middleware.isntAdmin = function(req, res, next) {
+    if(req.user.adminPowers < 2) {
+        next();
+    } else {
+        sendJSON(res, "error", { message: "Admins Can't Do that!" }, 400);
     }
 }
 
