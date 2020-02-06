@@ -78,6 +78,12 @@ router.post("/login", function(req, res, next) {
 
 });
 
+router.delete("/profile", authMiddleware.loggedIn, function(req, res) {
+    User.findById(rq.user._id, function(err, foundUser) {
+        sendJSON(res, "success", { message: "Nothing is happening" });
+    });
+});
+
 function sendProfile(req, res, foundUser) {
     foundUser.populate("levels").exec(function (err, foundUser) {
         if (err) {
