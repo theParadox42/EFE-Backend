@@ -67,6 +67,7 @@ userSchema.methods.generateToken = function () {
 userSchema.methods.getNiceVersion = function () {
     var niceVersion = JSON.parse(JSON.stringify(this));
     niceVersion.sinceCreated = this.sinceCreated;
+    niceVersion.id = this._id;
     delete niceVersion.tokens;
     for (let i = 0; i < this.levels.length; i++) {
         niceVersion.levels[i].sinceCreated = moment(this.levels[i].createdAt).fromNow();

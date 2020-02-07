@@ -4,6 +4,7 @@ var express         = require("express"),
     // mongoose        = require("mongoose"),
     passport        = require("passport"),
     User            = require("../models/user"),
+    Level           = require("../models/level"),
     sendJSON        = require("../utilities/send-json"),
     authMiddlware   = require("../middleware/auth"),
     emailValidator  = require("email-validator");
@@ -78,16 +79,40 @@ router.post("/login", function(req, res, next) {
 
 });
 
-router.delete("/profile", authMiddleware.loggedIn, function(req, res) {
-    User.findById(rq.user._id, function(err, foundUser) {
-        sendJSON(res, "success", { message: "Nothing is happening" }); 
+function deleteUser(req, res, userDeleteQueryData) {
+    userDeleteQueryData.exec(function(err, deletedUser) {
+        if (err) {
+            sendJSON(res, "error", { message: "Error deleting account", error: err }, 400);
+        } else if (!deletedUser) {
+            sendJSON(res, "error", { message: "No user found to delete", error: "User not found" }, 400);
+        } else {
+            Level.deleteMany({ "creator.id": deletedUser._id }, function (err, deletedLevels) {
+                if (err) {
+                    sendJSON(res, "success", { message: "Deleted User but not levels associated with it", user: deletedUser.getNiceVersion() });
+                } else {
+                    sendJSON(res, "success", { message: "Deleted User and associated levels", user: deletedUser.getNiceVersion() });
+                }
+            });
+        }
     });
+};
+
+router.delete("/profile", authMiddleware.isntAdmin, function(req, res) {
+    deleteUser(req, res, User.findByIdAndDelete(req.user._id));
+});
+
+router.delete("/profile/:username", authMiddlware.isAdmin(1), function(req, res) {
+    if (req.user.adminPowers >= 2) {
+        sendJSON(res, "error", { message: "I ALREADY SAID ADMINS CAN'T DELETE THEIR OWN ACCOUNTS. CONTACT ME IF YOU NEED TO. paradox42.programming@gmail.com IS A GOOD PLACE TO START" }, 1000);
+    } else {
+        deleteUser(req, res, User.findOneAndDelete({ username: req.params.username }));
+    }
 });
 
 function sendProfile(req, res, foundUser) {
     foundUser.populate("levels").exec(function (err, foundUser) {
         if (err) {
-            sendJSON(res, "error", { message: "Error Finding User", error: err }, 500)
+            sendJSON(res, "error", { message: "Error Finding User", error: err }, 400);
         } else if (foundUser) {
             sendJSON(res, "success",
                 {
@@ -95,7 +120,7 @@ function sendProfile(req, res, foundUser) {
                     user: foundUser.getNiceVersion()
                 });
         } else {
-            sendJSON(res, "error", { message: "No User Found!", error: "Not Found" }, 400);
+            sendJSON(res, "error", { message: "No User Found!", error: "User not found" }, 400);
         }
     });
 };

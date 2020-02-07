@@ -62,19 +62,25 @@ middleware.ownsLevel = function(adminPowersNeeded) {
         });
     }
 };
-middleware.isAdmin = function(req, res, next) {
-    if(req.user.adminPowers >= 2) {
-        next();
-    } else {
-        sendJSON(res, "error", { message: "Not an admin!", error: "Insufficient Permissions" }, 400);
-    }
+middleware.isAdmin = function(adminPowersNeeded) {
+    return function(req, res, next) {
+        middleware.loggedIn(req, res, function() {
+            if (req.user.adminPowers >= adminPowersNeeded) {
+                next();
+            } else {
+                sendJSON(res, "error", { message: "Not an admin!", error: "Insufficient Permissions" }, 400);
+            }
+        });
+    };
 };
 middleware.isntAdmin = function(req, res, next) {
-    if(req.user.adminPowers < 2) {
-        next();
-    } else {
-        sendJSON(res, "error", { message: "Admins Can't Do that!" }, 400);
-    }
-}
+    middleware.loggedIn(req, res, function() {
+        if (req.user.adminPowers < 2) {
+            next();
+        } else {
+            sendJSON(res, "error", { message: "Admins Can't Do that!" }, 400);
+        }
+    });
+};
 
 module.exports = middleware;
