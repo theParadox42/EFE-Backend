@@ -9,6 +9,7 @@ var _               = require("dotenv").config(),
     levelRoutes     = require("./routes/levels"),
     authRoutes      = require("./routes/users"),
     indexRoutes     = require("./routes/index"),
+    v1Routes        = require("./deprecated/v1/app"),
     passport        = require("passport"),
     LocalStrategy   = require("passport-local").Strategy,
     BearerStrategy  = require("passport-http-bearer").Strategy,
@@ -34,8 +35,9 @@ app.use(cors);
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
-app.use(authRoutes);
-app.use("/levels", levelRoutes);
+app.use("/v1", v1Routes);
+app.use("/v2", authRoutes);
+app.use("/v2/levels", levelRoutes);
 app.use(indexRoutes);
 
 
@@ -44,5 +46,5 @@ app.use(indexRoutes);
 //=================
 var appPort = process.env.PORT || 8080;
 app.listen(appPort, process.env.IP, function(){
-    console.log(`Listening on ${appPort}`);
+    console.log(`Listening on port ${appPort}`);
 });
