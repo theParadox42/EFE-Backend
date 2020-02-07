@@ -1,25 +1,40 @@
 {
   "name": "escapefromearth-backend",
-  "version": "1.0.0",
+  "version": "2.0.0-alpha.3",
   "description": "Backend escape from earth",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha tests/level-validator-test.js",
     "start": "node app.js",
-    "run": "node app.js"
+    "run": "node app.js",
+    "dev": "nodemon app.js"
   },
   "keywords": [
-    "Node"
+    "Escape From Earth",
+    "herokuapp",
+    "theParadox42"
   ],
   "author": "Paradox Programming",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "ejs": "^2.6.1",
+    "cors": "^2.8.5",
+    "crypto-random-string": "^3.1.0",
+    "dotenv": "^8.2.0",
+    "ejs": "^2.7.4",
+    "email-validator": "^2.0.4",
     "express": "^4.17.1",
-    "mongoose": "^5.7.5"
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
+    "mongoose": "^5.8.11",
+    "passport": "^0.4.1",
+    "passport-http-bearer": "^1.0.1",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^6.0.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^7.0.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/theParadox42/escape-from-earth-backend.git"
