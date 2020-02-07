@@ -1,14 +1,12 @@
 
 var express         = require("express"),
     router          = express.Router({ mergeParams: true }),
-    // mongoose        = require("mongoose"),
     passport        = require("passport"),
     User            = require("../models/user"),
     Level           = require("../models/level"),
     sendJSON        = require("../utilities/send-json"),
-    authMiddlware   = require("../middleware/auth"),
+    authMiddleware  = require("../middleware/auth"),
     emailValidator  = require("email-validator");
-
 
 router.post("/register", function(req, res) {
     
@@ -101,7 +99,7 @@ router.delete("/profile", authMiddleware.isntAdmin, function(req, res) {
     deleteUser(req, res, User.findByIdAndDelete(req.user._id));
 });
 
-router.delete("/profile/:username", authMiddlware.isAdmin(1), function(req, res) {
+router.delete("/profile/:username", authMiddleware.isAdmin(1), function(req, res) {
     if (req.user.adminPowers >= 2) {
         sendJSON(res, "error", { message: "I ALREADY SAID ADMINS CAN'T DELETE THEIR OWN ACCOUNTS. CONTACT ME IF YOU NEED TO. paradox42.programming@gmail.com IS A GOOD PLACE TO START" }, 1000);
     } else {
@@ -125,7 +123,7 @@ function sendProfile(req, res, foundUser) {
     });
 };
 
-router.get("/profile", authMiddlware.loggedIn, function (req, res) {
+router.get("/profile", authMiddleware.loggedIn, function (req, res) {
     sendProfile(req, res, User.findById(req.user._id));
 });
 

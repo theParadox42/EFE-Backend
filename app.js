@@ -44,5 +44,5 @@ app.use(indexRoutes);
 //=================
 var appPort = process.env.PORT || 8080;
 app.listen(appPort, process.env.IP, function(){
-    console.log(`API app started on port ${appPort}`);
+    console.log(`Listening on ${appPort}`);
 });
