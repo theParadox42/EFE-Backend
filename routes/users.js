@@ -8,6 +8,7 @@ var express         = require("express"),
     authMiddleware  = require("../middleware/auth"),
     emailValidator  = require("email-validator");
 
+// Create an account
 router.post("/register", function(req, res) {
     
     var body = req.body;
@@ -47,6 +48,7 @@ router.post("/register", function(req, res) {
 
 });
 
+// Used to access tokens
 router.post("/login", function(req, res, next) {
 
     // Check if user is already logged in
@@ -97,6 +99,7 @@ function deleteUser(req, res, userDeleteQueryData) {
 
 router.delete("/profile", authMiddleware.isntAdmin, function(req, res) {
     deleteUser(req, res, User.findByIdAndDelete(req.user._id));
+    req.logout();
 });
 
 router.delete("/profile/:username", authMiddleware.isAdmin(1), function(req, res) {

@@ -14,7 +14,7 @@ var _               = require("dotenv").config(),
     BearerStrategy  = require("passport-http-bearer").Strategy,
     bearerConfig    = require("./config/passport-bearer"),
     User            = require("./models/user"),
-    allowCrossDomain= require("./middleware/cors"),
+    cors            = require("./middleware/cors"),
     bodyParser      = require("body-parser");
 
 // Mongoose
@@ -27,8 +27,8 @@ passport.use(new BearerStrategy(bearerConfig))
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Temporay CORS Fix
-app.use(allowCrossDomain);
+// CORS Stuff
+app.use(cors);
 
 // Body Parser
 app.use(bodyParser.urlencoded({ extended: true }));

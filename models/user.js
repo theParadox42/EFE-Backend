@@ -1,4 +1,5 @@
 
+// Dependencies
 var mongoose                = require("mongoose"),
     passportLocalMongoose   = require("passport-local-mongoose");
     moment                  = require("moment"),
@@ -36,9 +37,36 @@ var userSchema = new mongoose.Schema({
         }
     ],
     meta: {
-        totalLikes: Number,
-        totalDislikes: Number,
-        flags: Number
+        recievedLikes: {
+            type: Number,
+            default: 0
+        },
+        recievedDislikes: {
+            type: Number,
+            default: 0
+        },
+        flags: {
+            type: Number,
+            default: 0
+        },
+        likedLevels: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Level"
+            }
+        ],
+        dislikedLevels: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Level"
+            }
+        ],
+        flaggedLevels: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Level"
+            }
+        ]
     },
     tokens: [
         {

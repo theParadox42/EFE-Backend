@@ -104,4 +104,18 @@ router.delete("/:levelid", authMiddleware.ownsLevel(1), function(req, res) {
     });
 });
 
+// Vote up a level
+router.post("/:levelid/like", authMiddleware.loggedIn, function(req, res) {
+    Level.findById(req.params.id, function(err, foundLevel) {
+        if (err) {
+            sendJSON(res, "error", { message: "Error finding level to like", error: err }, 400);
+        } else if(!foundLevel) {
+            sendJSON(res, "error", { message: "No level found to like", error: "Level not found" }, 400);
+        } else {
+            // req.user.
+            sendJSON(res, "success", { message: "Liking levels hasn't been finished yet", error: "Not yet implemented" }, 501);
+        }
+    });
+})
+
 module.exports = router;

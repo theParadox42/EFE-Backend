@@ -1,10 +1,20 @@
+var cors = require("cors");
 
-// Basically lets anyone send whatever kinda request they want to the server
+var allowedOrigins = process.env.ACCESS_CONTROL_ALLOW_ORIGIN.split(",");
 
-module.exports = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', process.env.ACCESS_CONTROL_ALLOW_ORIGIN || "*");
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-
-    next();
-};
+module.exports = cors({
+    origin: function (origin, callback) {
+        // If the ALLOW_CONTROL_ACCESS_ORIGIN is empty or allows everyone
+        if (typeof allowedOrigins != "object" || allowedOrigins.length == 0 || allowedOrigins[0] == "*") {
+            return callback(null, true);
+        }
+        // Allows mobile apps
+        if (!origin) return callback(null, true);
+        // Checks other websites
+        if (allowedOrigins.indexOf(origin) === -1) {
+            var msg = "The CORS policy for this site does not allow access from the specified Origin.";
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    }
+});
