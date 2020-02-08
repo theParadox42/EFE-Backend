@@ -90,7 +90,7 @@ userSchema.methods.getNiceVersion = function () {
     delete niceVersion.tokens;
     delete niceVersion.meta.myLikes;
     delete niceVersion.meta.myDislikes;
-    niceVersion.levels = makeNiceArray(niceVersion.levels);
+    niceVersion.levels = makeNiceArray(this.levels);
     return niceVersion;
 };
 

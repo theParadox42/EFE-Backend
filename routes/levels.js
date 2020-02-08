@@ -97,7 +97,7 @@ router.delete("/:levelid", authMiddleware.ownsLevel(1), function(req, res) {
                     if (levelIndex > -1) {
                         foundUser.levels.splice(levelIndex, 1);
                         foundUser.save();
-                        User.updateMany({ "meta.myLikes": deletedLevel }, { $pull: { "meta.myLikes": deletedLevel }}, function(err) {
+                        User.updateMany({ "meta.myLikes": deletedLevel.id }, { $pull: { "meta.myLikes": deletedLevel.id }}, function(err) {
                             if (err) {
                                 sendJSON(res, "success", { 
                                     message: "Deleted level but wasn't able to remove votes from users", 
