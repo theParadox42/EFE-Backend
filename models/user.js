@@ -4,7 +4,8 @@ var mongoose                = require("mongoose"),
     passportLocalMongoose   = require("passport-local-mongoose");
     moment                  = require("moment"),
     jwt                     = require("jsonwebtoken"),
-    randomStringGenerator   = require("crypto-random-string");
+    randomStringGenerator   = require("crypto-random-string"),
+    makeNiceArray           = require("../utilities/make-array-nice");
 
 var userSchema = new mongoose.Schema({
     username: {
@@ -45,23 +46,13 @@ var userSchema = new mongoose.Schema({
             type: Number,
             default: 0
         },
-        flags: {
-            type: Number,
-            default: 0
-        },
-        likedLevels: [
+        myLikes: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Level"
             }
         ],
-        dislikedLevels: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Level"
-            }
-        ],
-        flaggedLevels: [
+        myDislikes: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Level"
@@ -97,9 +88,9 @@ userSchema.methods.getNiceVersion = function () {
     niceVersion.sinceCreated = this.sinceCreated;
     niceVersion.id = this._id;
     delete niceVersion.tokens;
-    for (let i = 0; i < this.levels.length; i++) {
-        niceVersion.levels[i].sinceCreated = moment(this.levels[i].createdAt).fromNow();
-    }
+    delete niceVersion.meta.myLikes;
+    delete niceVersion.meta.myDislikes;
+    niceVersion.levels = makeNiceArray(niceVersion.levels);
     return niceVersion;
 };
 
