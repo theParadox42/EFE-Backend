@@ -38,14 +38,6 @@ var userSchema = new mongoose.Schema({
         }
     ],
     meta: {
-        recievedLikes: {
-            type: Number,
-            default: 0
-        },
-        recievedDislikes: {
-            type: Number,
-            default: 0
-        },
         myLikes: [
             {
                 type: mongoose.Schema.Types.ObjectId,
@@ -83,6 +75,22 @@ userSchema.methods.generateToken = function () {
     return token;
 };
 
+function getTotalVotes(user, key) {
+    var totalVotes = 0;
+    var returnVotes = false;
+    user.levels.forEach(function (level) {
+        if (typeof level.title == "text" && typeof level.meta.likes.length == "number") {
+            totalVotes += level.meta.likes.length;
+            returnVotes = true;
+        }
+    });
+    if (returnVotes) {
+        return totalVotes;
+    } else {
+        return null;
+    }
+}
+
 userSchema.methods.getNiceVersion = function () {
     var niceVersion = JSON.parse(JSON.stringify(this));
     niceVersion.sinceCreated = this.sinceCreated;
@@ -91,6 +99,11 @@ userSchema.methods.getNiceVersion = function () {
     delete niceVersion.meta.myLikes;
     delete niceVersion.meta.myDislikes;
     niceVersion.levels = makeNiceArray(this.levels);
+    // Manage like counts
+    var totalLikes = getTotalVotes(this, "likes");
+    var totalDislikes = getTotalVotes(this, "dislikes");
+    if(totalLikes) niceVersion.meta.totalLikes = totalLikes;
+    if(totalDislikes) niceVersion.meta.totalDislikes = totalDislikes;
     return niceVersion;
 };
 

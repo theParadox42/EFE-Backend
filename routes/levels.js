@@ -117,20 +117,19 @@ router.delete("/:levelid", authMiddleware.ownsLevel(1), function(req, res) {
     });
 });
 
-// Like/UnLike a level
-router.post("/:levelid/like", authMiddleware.loggedIn, function(req, res) {
-    modifyLevelVotes(req, res, "like", true);
-});
-router.post("/:levelid/un/like", authMiddleware.loggedIn, function (req, res) {
-    modifyLevelVotes(req, res, "like", false);
+// Like A Level
+router.post("/like/:levelid", authMiddleware.loggedIn, function(req, res) {
+    modifyLevelVotes(req, res, "like");
 });
 
-// Dislike/UnDislike a level
-router.post("/:levelid/dislike", authMiddleware.loggedIn, function(req, res) {
-    modifyLevelVotes(req, res, "dislike", true);
+// Dislike A Level
+router.post("/dislike/:levelid", authMiddleware.loggedIn, function(req, res) {
+    modifyLevelVotes(req, res, "dislike");
 });
-router.post("/:levelid/un/dislike", authMiddleware.loggedIn, function (req, res) {
-    modifyLevelVotes(req, res, "dislike", false);
+
+// Remove Rating From Level
+router.post("/unlike/:levelid", authMiddleware.loggedIn, function (req, res) {
+    modifyLevelVotes(req, res, "neutral");
 });
 
 // Export stuff
