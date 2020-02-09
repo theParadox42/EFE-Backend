@@ -22,7 +22,7 @@ var levelSchema = new mongoose.Schema({
         id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
-        },
+        }
     },
     createdAt: {
         type: Date,
@@ -38,8 +38,18 @@ var levelSchema = new mongoose.Schema({
             type: Boolean,
             default: false
         },
-        likes: [ String ],
-        dislikes: [ String ]
+        likes: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ],
+        dislikes: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ]
     },
 });
 
