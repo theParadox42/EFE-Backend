@@ -24,11 +24,21 @@ module.exports = {
             } else if (!deletedUser) {
                 sendJSON(res, "error", { message: "No user found to delete", error: "User not found" }, 400);
             } else {
-                Level.deleteMany({ "creator.id": deletedUser._id }, function (err, deletedLevels) {
+                // Deletes levels
+                Level.deleteMany({ "creator.id": deletedUser._id }, function (err) {
                     if (err) {
                         sendJSON(res, "success", { message: "Deleted User but not levels associated with it", user: deletedUser.getNiceVersion() });
                     } else {
-                        sendJSON(res, "success", { message: "Deleted User and associated levels", user: deletedUser.getNiceVersion() });
+                        // Remove votes from levels
+                        Level.updateMany({ "meta.likes": deletedUser._id },
+                        { $pull: { "meta.likes": deletedUser._id } },
+                        function (err) {
+                            if (err) {
+                                sendJSON(res, "error", { message: "Error finding voted levels", error: err }, 400);
+                            } else {
+                                sendJSON(res, "success", { message: "Deleted User and associated levels", user: deletedUser.getNiceVersion() });
+                            }
+                        });
                     }
                 });
             }

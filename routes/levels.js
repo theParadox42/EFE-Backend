@@ -76,6 +76,7 @@ router.put("/:levelid", authMiddleware.ownsLevel(2), function (req, res) {
 
 // DELETE Level (1 means admin/moderator override)
 router.delete("/:levelid", authMiddleware.ownsLevel(1), function(req, res) {
+    // Deletes level
     Level.findByIdAndDelete(req.params.levelid, function(err, deletedLevel) {
         if(err) {
             sendJSON(res, "error", { message: "Error deleting level", error: err }, 400);
@@ -85,32 +86,33 @@ router.delete("/:levelid", authMiddleware.ownsLevel(1), function(req, res) {
                 error: "Level not found" 
             }, 400);
         } else {
-            User.findById(deletedLevel.creator.id, function (err, foundUser) {
+            // Removes level from user data
+            User.findByIdAndUpdate(deletedLevel.creator.id,
+                { $pull: { levels: deletedLevel._id } },
+                function (err, foundUser) {
                 if (err) {
                     sendJSON(res, "error", { message: "Error finding associated user", error: err }, 400);
                 } else if (!foundUser) {
                     sendJSON(res, "error", { message: "No associated user found!", error: "User not found" }, 400);
                 } else {
-                    var levelIndex = foundUser.levels.findIndex(function(userLevel) {
-                        return userLevel.equals(deletedLevel._id);
+                    User.updateMany({ 
+                        $or: [
+                            { "meta.myLikes": deletedLevel._id },
+                            { "meta.myDislikes": deletedLevel._id }
+                        ]
+                    },
+                    { $pull: { "meta.myLikes": deletedLevel._id, "meta.myDislikes": deletedLevel._id } },
+                    function(err) {
+                        if (err) {
+                            sendJSON(res, "success", { 
+                                message: "Deleted level but wasn't able to remove votes from users", 
+                                error: err,
+                                level: deletedLevel.getNiceVersion()
+                            });
+                        } else {
+                            sendJSON(res, "success", { message: "Succesfully deleted level!", level: deletedLevel.getNiceVersion() });
+                        }
                     });
-                    if (levelIndex > -1) {
-                        foundUser.levels.splice(levelIndex, 1);
-                        foundUser.save();
-                        User.updateMany({ "meta.myLikes": deletedLevel.id }, { $pull: { "meta.myLikes": deletedLevel.id }}, function(err) {
-                            if (err) {
-                                sendJSON(res, "success", { 
-                                    message: "Deleted level but wasn't able to remove votes from users", 
-                                    error: err,
-                                    level: deletedLevel.getNiceVersion()
-                                });
-                            } else {
-                                sendJSON(res, "success", { message: "Succesfully deleted level!", level: deletedLevel.getNiceVersion() });
-                            }
-                        });
-                    } else {
-                        sendJSON(res, "success", { message: "Deleted level but it doesn't exist in user data", error: "Level index not found" });
-                    }
                 }
             });
         }
