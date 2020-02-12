@@ -1,5 +1,5 @@
 {
-  "name": "escapefromearth-backend",
+  "name": "EFE-Backend",
   "version": "2.0.1",
   "description": "Backend escape from earth",
   "main": "app.js",
@@ -15,7 +15,7 @@
     "theParadox42"
   ],
   "author": "Paradox Programming",
-  "license": "MIT",
+  "license": "GPL-2.0-only",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -37,10 +37,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/theParadox42/escape-from-earth-backend.git"
+    "url": "git+https://github.com/theParadox42/EFE-Backend.git"
   },
   "bugs": {
-    "url": "https://github.com/theParadox42/escape-from-earth-backend/issues"
+    "url": "https://github.com/theParadox42/EFE-Backend/issues"
   },
-  "homepage": "https://escapefromearth.tk"
+  "homepage": "https://escape-from-earth.herokuapp.com"
 }
