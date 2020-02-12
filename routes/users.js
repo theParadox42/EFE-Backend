@@ -52,7 +52,7 @@ router.post("/register", function(req, res) {
 router.post("/login", function(req, res, next) {
 
     // Check if user is already logged in
-    authMiddlware.getUser(req, res, function(_, user) {
+    authMiddleware.getUser(req, res, function(_, user) {
 
         var user = req.user
         if (user) {

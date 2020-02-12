@@ -1,10 +1,10 @@
 
 // Some AUTH middleware
 
-var sendJSON    = require("../utilities/send-json"),
-    User        = require("../models/user"),
-    Level       = require("../models/level"),
-    passport    = require("passport");
+var TokenExpiredError   = require("jsonwebtoken").TokenExpiredError,
+    sendJSON            = require("../utilities/send-json"),
+    Level               = require("../models/level"),
+    passport            = require("passport");
 
 
 function authUser(req, res, callback) {
@@ -33,8 +33,12 @@ var middleware = {
     getUser: authUser,
     loggedIn: function(req, res, next) {
         authUser(req, res, function(err, user) {
-            if(err) {
-                sendJSON(res, "error", { message: "Bad Auth Request", error: err }, 400);
+            if (err) {
+                if (err instanceof TokenExpiredError) {
+                    sendJSON(res, "error", { message: "Expired token!", error: err }, 200);
+                } else {
+                    sendJSON(res, "error", { message: "Bad Auth Request", error: err }, 400);
+                }
             } else if(!user) {
                 sendJSON(res, "error", { message: "Unauthorized Request", error: "Empty User" }, 400);
             } else {

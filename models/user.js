@@ -69,7 +69,7 @@ userSchema.methods.generateToken = function () {
     // Really just a random string that has no purpose but to make tokens more asthetically pleasing
     var user = this;
     var key = randomStringGenerator({ length: 20, type: "base64" });
-    var token = jwt.sign({ id: user.id.toString(), key: key }, process.env.SECRET, { expiresIn: "7 days" });
+    var token = jwt.sign({ id: user.id.toString(), key: key }, process.env.SECRET, { expiresIn: "14 days" });
     user.tokens = user.tokens.concat({ token });
     user.save();
     return token;
