@@ -14,13 +14,5 @@ Feel free to contact me [here](https://paradox42.tech/p/contact) if you have any
  - Clone or download however desired onto a computer, with a terminal  
  - Make sure `node.js` and `npm` are installed  
  - Run `npm install`  
- - Create a file called `.env`  
- - Fill that file with the following info
-```txt
-DB=test_db
-DB_USER=[EFE Mongo Atlas Username]
-DB_PASS=[EFE Mongo Atlas Password]
-PORT=3000
-SECRET=W&@tEv%r_&ecR#t+Y0u.C{0O$e,I%-gR8!
-ACCESS_CONTROL_ALLOW_ORIGIN=*
-```
+ - Open the file .env with your favorite file editor
+ - Fill in the `MONGO_CONNECTION` with a string that connects to a database
