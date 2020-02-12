@@ -4,7 +4,8 @@ var mongoose                = require("mongoose"),
     passportLocalMongoose   = require("passport-local-mongoose");
     moment                  = require("moment"),
     jwt                     = require("jsonwebtoken"),
-    randomStringGenerator   = require("crypto-random-string");
+    randomStringGenerator   = require("crypto-random-string"),
+    makeNiceArray           = require("../utilities/make-array-nice");
 
 var userSchema = new mongoose.Schema({
     username: {
@@ -37,31 +38,13 @@ var userSchema = new mongoose.Schema({
         }
     ],
     meta: {
-        recievedLikes: {
-            type: Number,
-            default: 0
-        },
-        recievedDislikes: {
-            type: Number,
-            default: 0
-        },
-        flags: {
-            type: Number,
-            default: 0
-        },
-        likedLevels: [
+        myLikes: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Level"
             }
         ],
-        dislikedLevels: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Level"
-            }
-        ],
-        flaggedLevels: [
+        myDislikes: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Level"
@@ -86,20 +69,41 @@ userSchema.methods.generateToken = function () {
     // Really just a random string that has no purpose but to make tokens more asthetically pleasing
     var user = this;
     var key = randomStringGenerator({ length: 20, type: "base64" });
-    var token = jwt.sign({ id: user.id.toString(), key: key }, process.env.SECRET, { expiresIn: "7 days" });
+    var token = jwt.sign({ id: user.id.toString(), key: key }, process.env.SECRET, { expiresIn: "14 days" });
     user.tokens = user.tokens.concat({ token });
     user.save();
     return token;
 };
+
+function getTotalVotes(user, key) {
+    var totalVotes = 0;
+    var returnVotes = false;
+    user.levels.forEach(function (level) {
+        if (typeof level.title == "text" && typeof level.meta.likes.length == "number") {
+            totalVotes += level.meta.likes.length;
+            returnVotes = true;
+        }
+    });
+    if (returnVotes) {
+        return totalVotes;
+    } else {
+        return null;
+    }
+}
 
 userSchema.methods.getNiceVersion = function () {
     var niceVersion = JSON.parse(JSON.stringify(this));
     niceVersion.sinceCreated = this.sinceCreated;
     niceVersion.id = this._id;
     delete niceVersion.tokens;
-    for (let i = 0; i < this.levels.length; i++) {
-        niceVersion.levels[i].sinceCreated = moment(this.levels[i].createdAt).fromNow();
-    }
+    delete niceVersion.meta.myLikes;
+    delete niceVersion.meta.myDislikes;
+    niceVersion.levels = makeNiceArray(this.levels);
+    // Manage like counts
+    var totalLikes = getTotalVotes(this, "likes");
+    var totalDislikes = getTotalVotes(this, "dislikes");
+    if(totalLikes) niceVersion.meta.totalLikes = totalLikes;
+    if(totalDislikes) niceVersion.meta.totalDislikes = totalDislikes;
     return niceVersion;
 };
 

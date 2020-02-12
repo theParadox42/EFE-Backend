@@ -3,9 +3,11 @@ var express         = require("express"),
     router          = express.Router({ mergeParams: true }),
     User            = require("../models/user"),
     Level           = require("../models/level"),
-    sendJSON        = require("../utilities/send-json"),
     authMiddleware  = require("../middleware/auth"),
-    validateLevel   = require("../utilities/validate-level");
+    sendJSON        = require("../utilities/send-json"),
+    validateLevel   = require("../utilities/validate-level"),
+    modifyLevelVotes= require("../utilities/modify-votes"),
+    makeArrayNice   = require("../utilities/make-array-nice");
 
 // GET Levels
 router.get("/", function (req, res) {
@@ -13,7 +15,7 @@ router.get("/", function (req, res) {
         if (err) {
             sendJSON(res, "error", { message: "An error occurred retrieving levels", error: err }, 500);
         } else {
-            sendJSON(res, "levels", levels);
+            sendJSON(res, "success", { levels: makeArrayNice(levels), message: "Successfully got levels" });
         }
     });
 });
@@ -90,13 +92,24 @@ router.delete("/:levelid", authMiddleware.ownsLevel(1), function(req, res) {
                     sendJSON(res, "error", { message: "No associated user found!", error: "User not found" }, 400);
                 } else {
                     var levelIndex = foundUser.levels.findIndex(function(userLevel) {
-                        return userLevel.toString() == deletedLevel._id.toString();
+                        return userLevel.equals(deletedLevel._id);
                     });
                     if (levelIndex > -1) {
                         foundUser.levels.splice(levelIndex, 1);
-                        sendJSON(res, "success", { message: "Succesfully deleted level!", level: deletedLevel });
+                        foundUser.save();
+                        User.updateMany({ "meta.myLikes": deletedLevel.id }, { $pull: { "meta.myLikes": deletedLevel.id }}, function(err) {
+                            if (err) {
+                                sendJSON(res, "success", { 
+                                    message: "Deleted level but wasn't able to remove votes from users", 
+                                    error: err,
+                                    level: deletedLevel.getNiceVersion()
+                                });
+                            } else {
+                                sendJSON(res, "success", { message: "Succesfully deleted level!", level: deletedLevel.getNiceVersion() });
+                            }
+                        });
                     } else {
-                        sendJSON(res, "error", { message: "Level doesn't exist in user data", error: "Level index not found" }, 400);
+                        sendJSON(res, "success", { message: "Deleted level but it doesn't exist in user data", error: "Level index not found" });
                     }
                 }
             });
@@ -104,18 +117,20 @@ router.delete("/:levelid", authMiddleware.ownsLevel(1), function(req, res) {
     });
 });
 
-// Vote up a level
-router.post("/:levelid/like", authMiddleware.loggedIn, function(req, res) {
-    Level.findById(req.params.id, function(err, foundLevel) {
-        if (err) {
-            sendJSON(res, "error", { message: "Error finding level to like", error: err }, 400);
-        } else if(!foundLevel) {
-            sendJSON(res, "error", { message: "No level found to like", error: "Level not found" }, 400);
-        } else {
-            // req.user.
-            sendJSON(res, "success", { message: "Liking levels hasn't been finished yet", error: "Not yet implemented" }, 501);
-        }
-    });
-})
+// Like A Level
+router.post("/like/:levelid", authMiddleware.loggedIn, function(req, res) {
+    modifyLevelVotes(req, res, "like");
+});
 
+// Dislike A Level
+router.post("/dislike/:levelid", authMiddleware.loggedIn, function(req, res) {
+    modifyLevelVotes(req, res, "dislike");
+});
+
+// Remove Rating From Level
+router.post("/unlike/:levelid", authMiddleware.loggedIn, function (req, res) {
+    modifyLevelVotes(req, res, "neutral");
+});
+
+// Export stuff
 module.exports = router;
