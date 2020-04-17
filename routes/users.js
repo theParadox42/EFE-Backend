@@ -79,7 +79,7 @@ router.post("/login", function(req, res, next) {
 
 });
 
-function deleteUser(req, res, userDeleteQueryData) {
+function deleteUser(_, res, userDeleteQueryData) {
     userDeleteQueryData.exec(function(err, deletedUser) {
         if (err) {
             sendJSON(res, "error", { message: "Error deleting account", error: err }, 400);
@@ -110,7 +110,7 @@ router.delete("/profile/:username", authMiddleware.isAdmin(1), function(req, res
     }
 });
 
-function sendProfile(req, res, foundUser) {
+function sendProfile(_, res, foundUser) {
     foundUser.populate("levels").exec(function (err, foundUser) {
         if (err) {
             sendJSON(res, "error", { message: "Error Finding User", error: err }, 400);
