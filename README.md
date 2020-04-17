@@ -1,6 +1,7 @@
 # Escape From Earth Backend
 
 [![Build Status](https://travis-ci.org/theParadox42/EFE-Backend.svg?branch=auth)](https://travis-ci.org/theParadox42/EFE-Backend)
+[![DeepScan grade](https://deepscan.io/api/teams/8658/projects/10870/branches/155912/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=8658&pid=10870&bid=155912)
 
 This is the backend part of [escape from earth](https://escapefromearth.tk) that handles the community section of it. Changes are currently underway. `v1` is the version in use, but is about to be deprecated. `v2` is about to be released and brings a lot of great changes including user authentication, liking, disliking, and flagging levels, plus security boosts. The versions are available at [escape-from-earth.herokuapp.com/v1 OR v2](escape-from-earth.herokuapp.com)  
 
