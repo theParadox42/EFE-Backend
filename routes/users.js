@@ -79,7 +79,7 @@ router.post("/login", function(req, res, next) {
 
 });
 
-function deleteUser(_, res, userDeleteQueryData) {
+function deleteUser(res, userDeleteQueryData) {
     userDeleteQueryData.exec(function(err, deletedUser) {
         if (err) {
             sendJSON(res, "error", { message: "Error deleting account", error: err }, 400);
@@ -98,7 +98,7 @@ function deleteUser(_, res, userDeleteQueryData) {
 };
 
 router.delete("/profile", authMiddleware.isntAdmin, function(req, res) {
-    deleteUser(req, res, User.findByIdAndDelete(req.user._id));
+    deleteUser(res, User.findByIdAndDelete(req.user._id));
     req.logout();
 });
 
@@ -106,11 +106,11 @@ router.delete("/profile/:username", authMiddleware.isAdmin(1), function(req, res
     if (req.user.adminPowers >= 2) {
         sendJSON(res, "error", { message: "I ALREADY SAID ADMINS CAN'T DELETE THEIR OWN ACCOUNTS. CONTACT ME IF YOU NEED TO. paradox42.programming@gmail.com IS A GOOD PLACE TO START" }, 1000);
     } else {
-        deleteUser(req, res, User.findOneAndDelete({ username: req.params.username }));
+        deleteUser(res, User.findOneAndDelete({ username: req.params.username }));
     }
 });
 
-function sendProfile(_, res, foundUser) {
+function sendProfile(res, foundUser) {
     foundUser.populate("levels").exec(function (err, foundUser) {
         if (err) {
             sendJSON(res, "error", { message: "Error Finding User", error: err }, 400);
@@ -127,11 +127,11 @@ function sendProfile(_, res, foundUser) {
 };
 
 router.get("/profile", authMiddleware.loggedIn, function (req, res) {
-    sendProfile(req, res, User.findById(req.user._id));
+    sendProfile(res, User.findById(req.user._id));
 });
 
 router.get("/profile/:username", function(req, res) {
-    sendProfile(req, res, User.findOne({ username: req.params.username }));
+    sendProfile(res, User.findOne({ username: req.params.username }));
 });
 
 module.exports = router;

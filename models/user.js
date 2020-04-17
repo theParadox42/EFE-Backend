@@ -75,12 +75,12 @@ userSchema.methods.generateToken = function () {
     return token;
 };
 
-function getTotalVotes(user) {
+function getTotalVotes(user, key) {
     var totalVotes = 0;
     var returnVotes = false;
     user.levels.forEach(function (level) {
-        if (typeof level.title == "string" && typeof level.meta.likes.length == "number") {
-            totalVotes += level.meta.likes.length;
+        if (typeof level.title == "string" && typeof level.meta[key].length == "number") {
+            totalVotes += level.meta[key].length;
             returnVotes = true;
         }
     });
