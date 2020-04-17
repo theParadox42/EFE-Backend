@@ -1,7 +1,7 @@
 
 // Dependencies
 var mongoose                = require("mongoose"),
-    passportLocalMongoose   = require("passport-local-mongoose");
+    passportLocalMongoose   = require("passport-local-mongoose"),
     moment                  = require("moment"),
     jwt                     = require("jsonwebtoken"),
     randomStringGenerator   = require("crypto-random-string"),
@@ -75,11 +75,11 @@ userSchema.methods.generateToken = function () {
     return token;
 };
 
-function getTotalVotes(user, key) {
+function getTotalVotes(user) {
     var totalVotes = 0;
     var returnVotes = false;
     user.levels.forEach(function (level) {
-        if (typeof level.title == "text" && typeof level.meta.likes.length == "number") {
+        if (typeof level.title == "string" && typeof level.meta.likes.length == "number") {
             totalVotes += level.meta.likes.length;
             returnVotes = true;
         }
