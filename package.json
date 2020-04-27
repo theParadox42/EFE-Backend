@@ -33,7 +33,7 @@
     "passport-local-mongoose": "^6.0.1"
   },
   "devDependencies": {
-    "mocha": "^7.1.1"
+    "mocha": "^7.1.2"
   },
   "repository": {
     "type": "git",
